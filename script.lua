@@ -1,130 +1,144 @@
-if game.CoreGui:FindFirstChild("FreeSeedHub") then
-    game.CoreGui:FindFirstChild("FreeSeedHub"):Destroy()
-end
+-- FREE SEED HUB - Made by: @SkibidiScript
+-- Designed to be executed with a script executor in Grow a Garden
 
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HttpService = game:GetService("HttpService")
+local player = Players.LocalPlayer
 
-local function saveInventory(data)
-    writefile("FreeSeedHubData.json", HttpService:JSONEncode(data))
+-- Save/load inventory
+local filename = "free_seed_hub_data.json"
+local function saveData(data)
+    writefile(filename, HttpService:JSONEncode(data))
 end
-
-local function loadInventory()
-    if isfile("FreeSeedHubData.json") then
-        return HttpService:JSONDecode(readfile("FreeSeedHubData.json"))
+local function loadData()
+    if isfile(filename) then
+        return HttpService:JSONDecode(readfile(filename))
     else
         return {}
     end
 end
 
-local inventory = loadInventory()
+local inventory = loadData()
 
--- GUI Setup
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-ScreenGui.Name = "FreeSeedHub"
-
-local Frame = Instance.new("Frame", ScreenGui)
-Frame.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-Frame.Size = UDim2.new(0, 300, 0, 300)
-Frame.Position = UDim2.new(0.5, -150, 0.5, -150)
-Frame.BorderSizePixel = 0
-Frame.Active = true
-Frame.Draggable = true
-
-local UICorner = Instance.new("UICorner", Frame)
-UICorner.CornerRadius = UDim.new(0, 15)
-
--- Title
-local Title = Instance.new("TextLabel", Frame)
-Title.Text = "FREE SEED HUB"
-Title.Size = UDim2.new(1, 0, 0, 40)
-Title.TextColor3 = Color3.new(1, 1, 1)
-Title.BackgroundTransparency = 1
-Title.Font = Enum.Font.FredokaOne
-Title.TextScaled = true
-
--- Seed Name Input
-local SeedNameLabel = Instance.new("TextLabel", Frame)
-SeedNameLabel.Text = "SEED NAME:"
-SeedNameLabel.Size = UDim2.new(1, -20, 0, 25)
-SeedNameLabel.Position = UDim2.new(0, 10, 0, 50)
-SeedNameLabel.BackgroundTransparency = 1
-SeedNameLabel.Font = Enum.Font.FredokaOne
-SeedNameLabel.TextColor3 = Color3.new(1, 1, 1)
-SeedNameLabel.TextScaled = true
-
-local SeedNameBox = Instance.new("TextBox", Frame)
-SeedNameBox.PlaceholderText = "Text"
-SeedNameBox.Size = UDim2.new(1, -20, 0, 25)
-SeedNameBox.Position = UDim2.new(0, 10, 0, 80)
-SeedNameBox.Font = Enum.Font.SourceSans
-SeedNameBox.TextScaled = true
-
--- Amount Input
-local AmountLabel = Instance.new("TextLabel", Frame)
-AmountLabel.Text = "Amount:"
-AmountLabel.Size = UDim2.new(1, -20, 0, 25)
-AmountLabel.Position = UDim2.new(0, 10, 0, 115)
-AmountLabel.BackgroundTransparency = 1
-AmountLabel.Font = Enum.Font.FredokaOne
-AmountLabel.TextColor3 = Color3.new(1, 1, 1)
-AmountLabel.TextScaled = true
-
-local AmountBox = Instance.new("TextBox", Frame)
-AmountBox.PlaceholderText = "Text"
-AmountBox.Size = UDim2.new(1, -20, 0, 25)
-AmountBox.Position = UDim2.new(0, 10, 0, 145)
-AmountBox.Font = Enum.Font.SourceSans
-AmountBox.TextScaled = true
-
--- Get Button
-local GetButton = Instance.new("TextButton", Frame)
-GetButton.Text = "Get"
-GetButton.Size = UDim2.new(1, -20, 0, 35)
-GetButton.Position = UDim2.new(0, 10, 0, 185)
-GetButton.Font = Enum.Font.FredokaOne
-GetButton.TextScaled = true
-GetButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-local GetUICorner = Instance.new("UICorner", GetButton)
-GetUICorner.CornerRadius = UDim.new(0, 10)
-
--- Rainbow Credit Label
-local Credit = Instance.new("TextLabel", Frame)
-Credit.Text = "MADE BY: @SkibidiScript"
-Credit.Size = UDim2.new(1, -20, 0, 25)
-Credit.Position = UDim2.new(0, 10, 1, -30)
-Credit.BackgroundTransparency = 1
-Credit.Font = Enum.Font.FredokaOne
-Credit.TextScaled = true
-
--- Rainbow Effect
-task.spawn(function()
-    while true do
-        for hue = 0, 1, 0.01 do
-            Credit.TextColor3 = Color3.fromHSV(hue, 1, 1)
+-- Rainbow text function
+local function rainbowify(textLabel)
+    coroutine.wrap(function()
+        local hue = 0
+        while true do
+            textLabel.TextColor3 = Color3.fromHSV(hue, 1, 1)
+            hue = (hue + 0.01) % 1
             task.wait(0.05)
         end
-    end
-end)
+    end)()
+end
 
--- Button Logic
+-- GUI Setup
+local ScreenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+ScreenGui.Name = "FreeSeedHub"
+ScreenGui.ResetOnSpawn = false
+
+local Main = Instance.new("Frame", ScreenGui)
+Main.Size = UDim2.new(0, 300, 0, 250)
+Main.Position = UDim2.new(0.5, -150, 0.5, -125)
+Main.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+Main.BorderSizePixel = 3
+Main.Active = true
+Main.Draggable = true
+
+local UICorner = Instance.new("UICorner", Main)
+UICorner.CornerRadius = UDim.new(0, 16)
+
+local Title = Instance.new("TextLabel", Main)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.Text = "FREE SEED HUB"
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.TextScaled = true
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.FredokaOne
+
+local SeedLabel = Instance.new("TextLabel", Main)
+SeedLabel.Position = UDim2.new(0, 10, 0, 40)
+SeedLabel.Size = UDim2.new(0, 100, 0, 30)
+SeedLabel.Text = "SEED NAME:"
+SeedLabel.TextColor3 = Color3.new(1, 1, 1)
+SeedLabel.BackgroundTransparency = 1
+SeedLabel.Font = Enum.Font.FredokaOne
+SeedLabel.TextScaled = true
+
+local SeedBox = Instance.new("TextBox", Main)
+SeedBox.Position = UDim2.new(0, 120, 0, 40)
+SeedBox.Size = UDim2.new(0, 160, 0, 30)
+SeedBox.PlaceholderText = "Candy Blossom, etc"
+SeedBox.Font = Enum.Font.FredokaOne
+SeedBox.TextScaled = true
+
+local AmountLabel = Instance.new("TextLabel", Main)
+AmountLabel.Position = UDim2.new(0, 10, 0, 80)
+AmountLabel.Size = UDim2.new(0, 100, 0, 30)
+AmountLabel.Text = "AMOUNT:"
+AmountLabel.TextColor3 = Color3.new(1, 1, 1)
+AmountLabel.BackgroundTransparency = 1
+AmountLabel.Font = Enum.Font.FredokaOne
+AmountLabel.TextScaled = true
+
+local AmountBox = Instance.new("TextBox", Main)
+AmountBox.Position = UDim2.new(0, 120, 0, 80)
+AmountBox.Size = UDim2.new(0, 160, 0, 30)
+AmountBox.PlaceholderText = "10, 25, 100..."
+AmountBox.Font = Enum.Font.FredokaOne
+AmountBox.TextScaled = true
+AmountBox.Text = ""
+
+local GetButton = Instance.new("TextButton", Main)
+GetButton.Position = UDim2.new(0.5, -100, 0, 130)
+GetButton.Size = UDim2.new(0, 200, 0, 40)
+GetButton.Text = "GET"
+GetButton.TextScaled = true
+GetButton.Font = Enum.Font.FredokaOne
+GetButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+
+local MadeBy = Instance.new("TextLabel", Main)
+MadeBy.Position = UDim2.new(0, 0, 1, -30)
+MadeBy.Size = UDim2.new(1, 0, 0, 30)
+MadeBy.Text = "MADE BY: @SkibidiScript"
+MadeBy.TextScaled = true
+MadeBy.Font = Enum.Font.FredokaOne
+MadeBy.BackgroundTransparency = 1
+rainbowify(MadeBy)
+
+-- Seed Giver Logic
 GetButton.MouseButton1Click:Connect(function()
-    local seed = SeedNameBox.Text
+    local seedName = SeedBox.Text
     local amount = tonumber(AmountBox.Text)
 
-    if seed == "" or not amount then
-        GetButton.Text = "Invalid Input"
-        wait(1)
-        GetButton.Text = "Get"
+    if not seedName or seedName == "" or not amount or amount <= 0 then
+        warn("Please enter a valid seed name and amount")
         return
     end
 
-    GetButton.Text = "Processing..."
-    wait(10)
+    GetButton.Text = "WAITING 10S..."
+    GetButton.Active = false
+    task.wait(10)
+    GetButton.Text = "GET"
+    GetButton.Active = true
 
-    inventory[seed] = (inventory[seed] or 0) + amount
-    saveInventory(inventory)
-
-    GetButton.Text = "Done!"
-    wait(2)
-    GetButton.Text = "Get"
+    -- Try to find the RemoteEvent
+    local remote = ReplicatedStorage:FindFirstChild("RemoteEvent") or ReplicatedStorage:FindFirstChildWhichIsA("RemoteEvent")
+    if remote then
+        for i = 1, amount do
+            remote:FireServer(seedName)
+            task.wait(0.1)
+        end
+        inventory[seedName] = (inventory[seedName] or 0) + amount
+        saveData(inventory)
+    else
+        warn("RemoteEvent not found. Cannot give seeds.")
+    end
 end)
+
+-- Auto-load previous inventory (optional feature, can show it in chat)
+for seed, amt in pairs(inventory) do
+    print("[FREE SEED HUB] Loaded:", seed, amt)
+end
